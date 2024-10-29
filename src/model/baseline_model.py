@@ -25,7 +25,7 @@ class BaselineModel(nn.Module):
             nn.Linear(in_features=fc_hidden, out_features=n_class),
         )
 
-    def forward(self, data_object, **batch):
+    def forward(self, mix, **batch):
         """
         Model forward method.
 
@@ -34,7 +34,7 @@ class BaselineModel(nn.Module):
         Returns:
             output (dict): output dict containing logits.
         """
-        return {"logits": self.net(data_object)}
+        return {"logits": self.net(mix)}
 
     def __str__(self):
         """

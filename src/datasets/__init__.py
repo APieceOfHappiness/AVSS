@@ -1,1 +1,1 @@
-from src.datasets.example import ExampleDataset
+from src.datasets.dla_dataset import DlaDataset

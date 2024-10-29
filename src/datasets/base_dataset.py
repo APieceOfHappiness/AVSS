@@ -3,6 +3,7 @@ import random
 from typing import List
 
 import torch
+import torchaudio
 from torch.utils.data import Dataset
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ class BaseDataset(Dataset):
     """
 
     def __init__(
-        self, index, limit=None, shuffle_index=False, instance_transforms=None
+        self, index, target_sr=8000, limit=None, shuffle_index=False, instance_transforms=None
     ):
         """
         Args:
@@ -34,6 +35,7 @@ class BaseDataset(Dataset):
                 tensor name.
         """
         self._assert_index_is_valid(index)
+        self.target_sr = target_sr
 
         index = self._shuffle_and_limit_index(index, limit, shuffle_index)
         self._index: List[dict] = index
@@ -55,15 +57,20 @@ class BaseDataset(Dataset):
             instance_data (dict): dict, containing instance
                 (a single dataset element).
         """
-        data_dict = self._index[ind]
-        data_path = data_dict["path"]
-        data_object = self.load_object(data_path)
-        data_label = data_dict["label"]
+        data_sample = self._index[ind]
+        data_sample['mix'] = self.load_audio(data_sample['mix'])
 
-        instance_data = {"data_object": data_object, "labels": data_label}
-        instance_data = self.preprocess_data(instance_data)
+        if 's1' in data_sample and 's2' in data_sample:
+            data_sample['s1'] = self.load_audio(data_sample['s1'])
+            data_sample['s2'] = self.load_audio(data_sample['s2'])
 
-        return instance_data
+        if 'vid1' in data_sample and 'vid2' in data_sample:
+            data_sample['vid1'] = self.load_video(data_sample['vid1'])
+            data_sample['vid2'] = self.load_video(data_sample['vid2'])
+
+        data_sample = self.preprocess_data(data_sample)
+
+        return data_sample
 
     def __len__(self):
         """
@@ -71,17 +78,17 @@ class BaseDataset(Dataset):
         """
         return len(self._index)
 
-    def load_object(self, path):
-        """
-        Load object from disk.
+    def load_audio(self, path):
+        audio_tensor, sr = torchaudio.load(path)
+        audio_tensor = audio_tensor[0:1, :]  # remove all channels but the first
+        target_sr = self.target_sr
+        if sr != target_sr:
+            audio_tensor = torchaudio.functional.resample(audio_tensor, sr, target_sr)
+        return audio_tensor
 
-        Args:
-            path (str): path to the object.
-        Returns:
-            data_object (Tensor):
-        """
-        data_object = torch.load(path)
-        return data_object
+    # TODO:
+    def load_video(self, path):
+        return None 
 
     def preprocess_data(self, instance_data):
         """
@@ -139,12 +146,8 @@ class BaseDataset(Dataset):
                 such as label and object path.
         """
         for entry in index:
-            assert "path" in entry, (
-                "Each dataset item should include field 'path'" " - path to audio file."
-            )
-            assert "label" in entry, (
-                "Each dataset item should include field 'label'"
-                " - object ground-truth label."
+            assert "mix" in entry, (
+                "Each dataset item should include field 'mix'" " - path to audio file."
             )
 
     @staticmethod
