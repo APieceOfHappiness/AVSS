@@ -5,7 +5,7 @@ train:
   audio_ref: True
   video_ref: False 
   name: "train"
-  override: False
+  override: True
   instance_transforms: ${transforms.instance_transforms.train}
 val:
   _target_: src.datasets.DlaDataset
@@ -14,14 +14,14 @@ val:
   audio_ref: True
   video_ref: False 
   name: "val"
-  override: False
+  override: True
   instance_transforms: ${transforms.instance_transforms.train}
-test:
-  _target_: src.datasets.DlaDataset
-  dataset_path: "dla_dataset"
-  dataset_length: null
-  audio_ref: True
-  video_ref: False 
-  name: "test"
-  override: False
-  instance_transforms: ${transforms.instance_transforms.train}
+# test:
+#   _target_: src.datasets.DlaDataset
+#   dataset_path: "dla_dataset"
+#   dataset_length: null
+#   audio_ref: True
+#   video_ref: False 
+#   name: "test"
+#   override: False
+#   instance_transforms: ${transforms.instance_transforms.train}
