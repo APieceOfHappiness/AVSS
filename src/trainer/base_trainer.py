@@ -9,6 +9,8 @@ from src.datasets.data_utils import inf_loop
 from src.metrics.tracker import MetricTracker
 from src.utils.io_utils import ROOT_PATH
 
+import warnings
+
 
 class BaseTrainer:
     """
@@ -345,7 +347,10 @@ class BaseTrainer:
                 the dataloader with some of the tensors on the device.
         """
         for tensor_for_device in self.cfg_trainer.device_tensors:
-            batch[tensor_for_device] = batch[tensor_for_device].to(self.device)
+            if tensor_for_device in batch:
+                batch[tensor_for_device] = batch[tensor_for_device].to(self.device)
+            else:
+                warnings.warn(f'{tensor_for_device} not in batch', RuntimeWarning)
         return batch
 
     def transform_batch(self, batch):

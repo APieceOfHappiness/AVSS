@@ -1,9 +1,9 @@
 defaults:
-  - model: baseline
+  - model: baseline # 3
   - writer: wandb
-  - metrics: example
-  - datasets: example
-  - dataloader: example
+  - metrics: example # 4
+  - datasets: dla_dataset # 1
+  - dataloader: dla_dataloader # 2
   - transforms: example
   - _self_
 optimizer:
@@ -19,7 +19,7 @@ trainer:
   log_step: 50
   n_epochs: 100
   epoch_len: 500
-  device_tensors: ["data_object", "labels"] # which tensors should be on device (ex. GPU)
+  device_tensors: ["mix", "s1", "s2", "vid1", "vid2"] # which tensors should be on device (ex. GPU) if exists!
   resume_from: null # null or path to the checkpoint dir with *.pth and config.yaml
   device: auto # device name or "auto"
   override: False # if True, will override the previous run with the same name
