@@ -17,12 +17,11 @@ class BaselineModel(nn.Module):
         super().__init__()
 
         self.net = Sequential(
-            # people say it can approximate any function...
             nn.Linear(in_features=n_feats, out_features=fc_hidden),
             nn.ReLU(),
-            nn.Linear(in_features=fc_hidden, out_features=fc_hidden),
+            nn.Linear(in_features=fc_hidden, out_features=n_feats),
             nn.ReLU(),
-            nn.Linear(in_features=fc_hidden, out_features=n_class),
+            nn.Conv1d(in_channels=1, out_channels=2, kernel_size=1, stride=1, padding=0)
         )
 
     def forward(self, mix, **batch):
@@ -34,7 +33,12 @@ class BaselineModel(nn.Module):
         Returns:
             output (dict): output dict containing logits.
         """
-        return {"logits": self.net(mix)}
+        mix = mix.unsqueeze(1)  # Преобразуем из (B, L) в (B, 1, L)
+        mix = self.net(mix)
+        mix = mix.permute(1, 0, 2)  # Из (B, SC, L) делаем (SC, B, L)
+        # print(mix.shape)
+
+        return {"outputs": mix}
 
     def __str__(self):
         """
