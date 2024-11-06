@@ -33,6 +33,7 @@ class BaselineModel(nn.Module):
         Returns:
             output (dict): output dict containing logits.
         """
+        print(mix.shape)
         mix = mix.unsqueeze(1)  # Преобразуем из (B, L) в (B, 1, L)
         mix = self.net(mix)
         mix = mix.permute(1, 0, 2)  # Из (B, SC, L) делаем (SC, B, L)
