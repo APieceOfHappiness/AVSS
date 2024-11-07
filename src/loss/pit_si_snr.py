@@ -22,13 +22,13 @@ class PITSiSNRLoss(nn.Module):
     
 
 
-    def forward(self, outputs: torch.Tensor, s1: torch.Tensor, s2: torch.Tensor, **batch):
+    def forward(self, output_audios: torch.Tensor, s1: torch.Tensor, s2: torch.Tensor, **batch):
         """
         Loss function calculation logic.
 
         Calculate permutation-invariant SI-SNR loss for source separation.
         Args:
-            outputs: Predicted separated signals, tensor (num_spks, B, L)
+            output_audios: Predicted separated signals, tensor (num_spks, B, L)
             s1: Reference signal 1, tensor (num_spks, B, L)
             s2: Reference signal 2, tensor (num_spks, B, L)
         Returns:
@@ -37,7 +37,7 @@ class PITSiSNRLoss(nn.Module):
         egs = torch.stack([s1, s2])
         num_spks = egs.size(0)
         sisnr_mat = torch.stack(
-            [torch.stack([self.sisnr(outputs[s], egs[t]) for t in range(num_spks)]) for s in range(num_spks)]
+            [torch.stack([self.sisnr(output_audios[s], egs[t]) for t in range(num_spks)]) for s in range(num_spks)]
         )
         max_sisnr, _ = torch.max(sisnr_mat.sum(dim=0), dim=0)
         return {"loss": -max_sisnr.mean()}

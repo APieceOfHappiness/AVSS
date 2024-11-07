@@ -52,17 +52,17 @@ class SI_SNRiMetric(BaseMetric):
         max_sisnr, _ = torch.max(sisnr_mat.sum(dim=0), dim=0)
         return (max_sisnr - mix_sisnr.mean(dim=0)).mean()
 
-    def __call__(self, outputs: torch.Tensor, s1: torch.Tensor, s2: torch.Tensor, mix: torch.Tensor, **kwargs):
+    def __call__(self, output_audios: torch.Tensor, s1: torch.Tensor, s2: torch.Tensor, mix: torch.Tensor, **kwargs):
         """
         Metric calculation logic.
         
         Args:
-            outputs (Tensor): model output predictions, tensor of shape (num_spks, B, L)
+            output_audios (Tensor): model output predictions, tensor of shape (num_spks, B, L)
             refs (Tensor): ground-truth signals, tensor of shape (num_spks, B, L)
             mix (Tensor): mixed signal, tensor of shape (B, L)
         Returns:
             metric (float): calculated SI-SNRi
         """
         refs = torch.stack([s1, s2])
-        outputs, refs, mix = outputs.to(self.device), refs.to(self.device), mix.to(self.device)
-        return self.si_snr_i(outputs, refs, mix)
+        output_audios, refs, mix = output_audios.to(self.device), refs.to(self.device), mix.to(self.device)
+        return self.si_snr_i(output_audios, refs, mix)
