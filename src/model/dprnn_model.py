@@ -161,56 +161,22 @@ class DPRNNModel(nn.Module):
         Returns:
             output (dict[list[torch.Tensor]]): output dict containing separated audios.
         """
-        print("-----------------dprnn-----------------------")
-        #-------------------------------------------------------
-        start_event = torch.cuda.Event(enable_timing=True)
-        end_event = torch.cuda.Event(enable_timing=True)
-        #-------------------------------------------------------
         mix = mix.unsqueeze(1)  # [B, 1, L]
-
-        start_event.record()
         mix = self.feature_extractor(mix)  # [B, N, L]
-        end_event.record()
-        torch.cuda.synchronize()
-        print(f"Feature_extractor time: {start_event.elapsed_time(end_event)} ms")
 
-
-        start_event.record()
         mask = self._split_input(mix=mix, **self.split_config)  # [B, N, K, S]
-        end_event.record()
-        torch.cuda.synchronize()
-        print(f"Split input time: {start_event.elapsed_time(end_event)} ms")
 
-
-        start_event.record()
         mask = self.dprnn_blocks(mask)  # [B, N, K, S]
-        end_event.record()
-        torch.cuda.synchronize()
-        print(f"DPRNN blocks time: {start_event.elapsed_time(end_event)} ms")
-        
-        start_event.record()
+
         B, N, K, S = mask.shape
         mask = self.emb_expansion(mask)  # [B, N * num_of_speakers, K, S]
-        end_event.record()
-        torch.cuda.synchronize()
-        print(f"Embedding expansion time: {start_event.elapsed_time(end_event)} ms")
 
-        start_event.record()
         mask = mask.view(B, N, self.num_of_speakers, K, S).permute(2, 0, 1, 3, 4)  # [num_of_speakers, B, N, K, S]
         mask = self._overlap_add(mix=mask, **self.split_config)  # [num_of_speakers, B, N, L]
-        end_event.record()
-        torch.cuda.synchronize()
-        print(f"Overlap-add time: {start_event.elapsed_time(end_event)} ms")
 
-        start_event.record()
         output_audios = torch.stack([self.decoder(mask[speaker_id] * mix)
                              for speaker_id in range(self.num_of_speakers)])
-        end_event.record()
-        torch.cuda.synchronize()
-        print(f"Output_audios time: {start_event.elapsed_time(end_event)} ms")
-        print("-----------------dprnn-----------------------")
 
-        
         return {"output_audios": output_audios}
 
     def __str__(self):

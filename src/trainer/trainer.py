@@ -1,8 +1,6 @@
 from src.metrics.tracker import MetricTracker
 from src.trainer.base_trainer import BaseTrainer
 
-import torch
-
 class Trainer(BaseTrainer):
     """
     Trainer class. Defines the logic of batch logging and processing.
@@ -38,15 +36,7 @@ class Trainer(BaseTrainer):
         outputs = self.model(**batch)
         batch.update(outputs)
 
-        #-------------------------------------------------------
-        start_event = torch.cuda.Event(enable_timing=True)
-        end_event = torch.cuda.Event(enable_timing=True)
-        #-------------------------------------------------------
-        start_event.record()
         all_losses = self.criterion(**batch)        
-        end_event.record()
-        torch.cuda.synchronize()
-        print(f"Criterion time: {start_event.elapsed_time(end_event)} ms")
         
         batch.update(all_losses)
 
@@ -62,12 +52,8 @@ class Trainer(BaseTrainer):
             metrics.update(loss_name, batch[loss_name].item())
 
 
-        start_event.record()
         for met in metric_funcs:
             metrics.update(met.name, met(**batch))      
-        end_event.record()
-        torch.cuda.synchronize()
-        print(f"Metrics time: {start_event.elapsed_time(end_event)} ms")
         
         return batch
 
