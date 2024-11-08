@@ -1,7 +1,6 @@
 from src.metrics.tracker import MetricTracker
 from src.trainer.base_trainer import BaseTrainer
 
-
 class Trainer(BaseTrainer):
     """
     Trainer class. Defines the logic of batch logging and processing.
@@ -37,7 +36,8 @@ class Trainer(BaseTrainer):
         outputs = self.model(**batch)
         batch.update(outputs)
 
-        all_losses = self.criterion(**batch)
+        all_losses = self.criterion(**batch)        
+        
         batch.update(all_losses)
 
         if self.is_train:
@@ -51,8 +51,10 @@ class Trainer(BaseTrainer):
         for loss_name in self.config.writer.loss_names:
             metrics.update(loss_name, batch[loss_name].item())
 
+
         for met in metric_funcs:
-            metrics.update(met.name, met(**batch))
+            metrics.update(met.name, met(**batch))      
+        
         return batch
 
     def _log_batch(self, batch_idx, batch, mode="train"):
