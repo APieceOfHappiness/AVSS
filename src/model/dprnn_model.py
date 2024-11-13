@@ -51,8 +51,18 @@ class DPRNNBlock(nn.Module):
         return inter_out
 
 
+class Gate(nn.Module):
+    def __init__(self, hidden_dim: torch.Tensor) -> torch.Tensor:
+        super().__init__()
+        self.data_extrator = nn.Sequential(nn.Conv1d(hidden_dim, hidden_dim, 1), nn.Tanh())
+        self.importance_extractor = nn.Sequential(nn.Conv1d(hidden_dim, hidden_dim, 1), nn.Sigmoid())
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.data_extrator(x) * self.importance_extractor(x)
+
+
 class DPRNNModel(nn.Module):
-    def __init__(self, feature_dim, num_of_speakers, num_dprnn_layers, 
+    def __init__(self, feature_dim, num_of_speakers, num_dprnn_layers, norm_type,
                  feature_extractor_config, split_config, dprnn_block_config, **kwargs):
         """
         Args:
@@ -64,14 +74,21 @@ class DPRNNModel(nn.Module):
         self.feature_dim = feature_dim
         self.num_of_speakers = num_of_speakers
         self.split_config = split_config
+        self.relu = nn.ReLU()
 
         self.feature_extractor = nn.Conv1d(in_channels=1, out_channels=feature_dim, **feature_extractor_config)  # TODO: rename
+        # Add ReLU
+        
+        self.norm = getattr(nn, norm_type)(normalized_shape=feature_dim)
         self.dprnn_blocks = nn.Sequential(*[
             DPRNNBlock(**dprnn_block_config) for _ in range(num_dprnn_layers)
         ])
+        self.gate = Gate(feature_dim)
+
         self.emb_expansion = nn.Conv2d(in_channels=feature_dim, out_channels=feature_dim * num_of_speakers, kernel_size=1)
 
         self.decoder = nn.ConvTranspose1d(in_channels=feature_dim, out_channels=1, **feature_extractor_config)
+
 
 
     def _split_input(self, mix: torch.Tensor, chunks_length: int, hop_size: int) -> torch.Tensor:
@@ -161,21 +178,32 @@ class DPRNNModel(nn.Module):
         Returns:
             output (dict[list[torch.Tensor]]): output dict containing separated audios.
         """
+        B, L = mix.shape
         mix = mix.unsqueeze(1)  # [B, 1, L]
+
         mix = self.feature_extractor(mix)  # [B, N, L]
+        mask = self.norm(mix.permute(0, 2, 1)).permute(0, 2, 1)  # [B, N, L] (!)
 
-        mask = self._split_input(mix=mix, **self.split_config)  # [B, N, K, S]
+        mask = self._split_input(mix=mask, **self.split_config)  # [B, N, K, S]
 
+        #  for stability
         mask = self.dprnn_blocks(mask)  # [B, N, K, S]
-
+        mask = self.relu(mask)  # [B, N, K, S] (!)
+        
+        # ts
         B, N, K, S = mask.shape
         mask = self.emb_expansion(mask)  # [B, N * num_of_speakers, K, S]
 
         mask = mask.view(B, N, self.num_of_speakers, K, S).permute(2, 0, 1, 3, 4)  # [num_of_speakers, B, N, K, S]
         mask = self._overlap_add(mix=mask, **self.split_config)  # [num_of_speakers, B, N, L]
 
+        gated_masks = [self.gate(speaker_mask) for speaker_mask in mask]  # [num_of_speakers, B, N, L]
+        gated_masks = torch.stack(gated_masks)  # [num_of_speakers, B, N, L]
+        gated_masks = self.relu(gated_masks)  # [num_of_speakers, B, N, L] WOOOW
+        # ---------------------------
+
         output_audios = torch.stack([self.decoder(mask[speaker_id] * mix)
-                             for speaker_id in range(self.num_of_speakers)])
+                                     for speaker_id in range(self.num_of_speakers)])
 
         return {"output_audios": output_audios}
 
