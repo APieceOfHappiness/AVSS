@@ -105,12 +105,7 @@ class DPRNNModel(nn.Module):
         assert mix.shape[-1] % chunks_length == 0, 'input.shape[-1] must be divided by chunks_length'
         assert chunks_length % hop_size == 0, 'chunks_length must be divided by hop_size'
 
-        print(f'input.shape = {mix.shape}')
-        print(f'chunks_length = {chunks_length}')
-        print(f'hop_size = {hop_size}')
-
         pad = chunks_length - hop_size  # CHECK THIS!
-
 
         mix_padded = F.pad(mix, (pad, pad), "constant", 0)
         chunk_cnt = mix.shape[-1] // hop_size + (chunks_length // hop_size - 1)
@@ -121,25 +116,55 @@ class DPRNNModel(nn.Module):
 
         return torch.stack(chunks, dim=-1)  # Что по CUDA памяти?
     
+    # def _overlap_add(self, mix: torch.Tensor, chunks_length: int, hop_size: int) -> torch.Tensor:
+    #     """
+    #     transform every sample to the original length
+
+    #     Args:
+    #         mix (Tensor): 5D tensor [num_of_speakers, B, N, K, S]
+    #         pad (tuple[int, int]): pad info 
+    #     Returns:
+    #         output (Tensor): 4D tensor [num_of_speakers, B, N, L]
+    #     """
+    #     _, B, N, _, S = mix.shape
+    #     pad = chunks_length - hop_size  # TO CHECK
+        
+    #     L = hop_size * S + pad  # TO CHECK
+    #     reduced_tensor = torch.zeros((self.num_of_speakers, B, N, L), device=mix.device)
+
+    #     for chunk_id in range(mix.shape[4]):
+    #         reduced_tensor[:, :, :, hop_size * chunk_id: hop_size * chunk_id + chunks_length] += mix[:, :, :, :, chunk_id]
+
+    #     reduced_tensor = reduced_tensor[:, :, :, pad:-pad]
+    #     return reduced_tensor
+
     def _overlap_add(self, mix: torch.Tensor, chunks_length: int, hop_size: int) -> torch.Tensor:
         """
-        transform every sample to the original length
+        Transform every sample to the original length.
 
         Args:
             mix (Tensor): 5D tensor [num_of_speakers, B, N, K, S]
-            pad (tuple[int, int]): pad info 
         Returns:
             output (Tensor): 4D tensor [num_of_speakers, B, N, L]
         """
-        _, B, N, _, S = mix.shape
-        pad = chunks_length - hop_size  # TO CHECK
-        
-        L = hop_size * S + pad  # TO CHECK
-        reduced_tensor = torch.zeros((self.num_of_speakers, B, N, L))
+        num_of_speakers, B, N, K, S = mix.shape
+        pad = chunks_length - hop_size
+        L = hop_size * S + pad
 
-        for chunk_id in range(mix.shape[4]):
-            reduced_tensor[:, :, :, hop_size * chunk_id: hop_size * chunk_id + chunks_length] += mix[:, :, :, :, chunk_id]
+        batch_size = num_of_speakers * B * N
+        mix_flat = mix.reshape(batch_size, K, S)
 
+        chunk_ids = torch.arange(S, device=mix.device)
+        idx_base = hop_size * chunk_ids
+        indices = idx_base.unsqueeze(1) + torch.arange(K, device=mix.device).unsqueeze(0)
+        indices = indices.view(1, -1).repeat(batch_size, 1)
+
+        mix_flat = mix_flat.permute(0, 2, 1).contiguous().view(batch_size, -1)
+
+        reduced_tensor_flat = torch.zeros((batch_size, L), device=mix.device)
+        reduced_tensor_flat.scatter_add_(1, indices, mix_flat)
+
+        reduced_tensor = reduced_tensor_flat.view(num_of_speakers, B, N, L)
         reduced_tensor = reduced_tensor[:, :, :, pad:-pad]
         return reduced_tensor
 
@@ -168,6 +193,7 @@ class DPRNNModel(nn.Module):
         # ts
         B, N, K, S = mask.shape
         mask = self.emb_expansion(mask)  # [B, N * num_of_speakers, K, S]
+
         mask = mask.view(B, N, self.num_of_speakers, K, S).permute(2, 0, 1, 3, 4)  # [num_of_speakers, B, N, K, S]
         mask = self._overlap_add(mix=mask, **self.split_config)  # [num_of_speakers, B, N, L]
 
