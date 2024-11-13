@@ -1,7 +1,8 @@
 _target_: src.model.DPRNNModel
-feature_dim: 16
+feature_dim: 8 # 64
 num_of_speakers: 2
 num_dprnn_layers: 1
+norm_type: LayerNorm  # [LayerNorm, RMSNorm]
 
 feature_extractor_config:
   kernel_size: 5
@@ -14,9 +15,9 @@ split_config:
 
 dprnn_block_config:
   feature_dim: ${model.feature_dim}
-  hidden_channels: 16
+  hidden_channels: 8
   rnn_type: GRU  # [LSTM, GRU]
-  norm_type: LayerNorm  # [LayerNorm, RMSNorm]
+  norm_type: ${model.norm_type}
   dropout: 0
   bidirectional: True
 
