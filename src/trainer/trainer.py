@@ -75,7 +75,15 @@ class Trainer(BaseTrainer):
         # logging scheme might be different for different partitions
         if mode == "train":  # the method is called only every self.log_step steps
             # Log Stuff
-            pass
+            # self.writer.add_audio('mix', batch['mix'][0], sample_rate=8000)
+            # self.writer.add_audio('s1', batch['s1'][0], sample_rate=8000)
+            # self.writer.add_audio('s2', batch['s2'][0], sample_rate=8000)
+            self.writer.add_audio('output_audios1', batch['output_audios'][0][0], sample_rate=8000)
+            self.writer.add_audio('output_audios2', batch['output_audios'][1][0], sample_rate=8000)
         else:
             # Log Stuff
-            pass
+            self.writer.add_audio('mix', batch['mix'][0], sample_rate=8000)
+            self.writer.add_audio('s1', batch['s1'][0], sample_rate=8000)
+            self.writer.add_audio('s2', batch['s2'][0], sample_rate=8000)
+            self.writer.add_audio('output_audios1', batch['output_audios'][0][0], sample_rate=8000)
+            self.writer.add_audio('output_audios2', batch['output_audios'][1][0], sample_rate=8000)

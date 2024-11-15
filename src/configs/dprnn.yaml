@@ -7,8 +7,8 @@ defaults:
   - transforms: example
   - _self_
 optimizer:
-  _target_: torch.optim.Adam
-  lr: 3e-4
+  _target_: torch.optim.AdamW
+  lr: 3e-4  # RETUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUURN
 lr_scheduler:
   _target_: torch.optim.lr_scheduler.StepLR
   gamma: 0.9
@@ -19,6 +19,7 @@ trainer:
   log_step: 10
   n_epochs: 100
   epoch_len: 300
+  max_grad_norm: 400
   device_tensors: ["mix", "s1", "s2", "vid1", "vid2"] # which tensors should be on device (ex. GPU) if exists!
   resume_from: null # null or path to the checkpoint dir with *.pth and config.yaml
   device: auto # device name or "auto"

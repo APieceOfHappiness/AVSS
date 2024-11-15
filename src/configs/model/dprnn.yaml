@@ -1,22 +1,22 @@
 _target_: src.model.DPRNNModel
-feature_dim: 8 # 64
+feature_dim: 128 # 64
 num_of_speakers: 2
-num_dprnn_layers: 1
+num_dprnn_layers: 3
 norm_type: LayerNorm  # [LayerNorm, RMSNorm]
 
 feature_extractor_config:
-  kernel_size: 5
-  padding: 2
-  stride: 1
+  kernel_size: 3
+  padding: 1
+  stride: 2
 
 split_config:
-  chunks_length: 1000
-  hop_size: 500
+  chunks_length: 100
+  hop_size: 50
 
 dprnn_block_config:
   feature_dim: ${model.feature_dim}
-  hidden_channels: 8
-  rnn_type: GRU  # [LSTM, GRU]
+  hidden_channels: 128
+  rnn_type: LSTM  # [LSTM, GRU]
   norm_type: ${model.norm_type}
   dropout: 0
   bidirectional: True
