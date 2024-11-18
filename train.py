@@ -39,6 +39,9 @@ def main(config):
 
     # build model architecture, then print to console
     model = instantiate(config.model).to(device)
+    if config.trainer.use_compile:
+        model = torch.compile(model)
+
     logger.info(model)
 
     # get function handles of loss and metrics

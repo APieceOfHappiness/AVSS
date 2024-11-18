@@ -1,5 +1,6 @@
 from src.metrics.tracker import MetricTracker
 from src.trainer.base_trainer import BaseTrainer
+import torch
 
 class Trainer(BaseTrainer):
     """
@@ -69,21 +70,32 @@ class Trainer(BaseTrainer):
             mode (str): train or inference. Defines which logging
                 rules to apply.
         """
+        def peak_norm(pred_audio: torch.Tensor, ref_audio: torch.Tensor) -> torch.Tensor:
+            peak_pred = torch.max(torch.abs(pred_audio))
+            peak_ref = torch.max(torch.abs(ref_audio))
+            normalized_audio = pred_audio * (peak_ref / peak_pred)
+            return normalized_audio
+
         # method to log data from you batch
         # such as audio, text or images, for example
 
-        # logging scheme might be different for different partitions
         if mode == "train":  # the method is called only every self.log_step steps
+            pass
             # Log Stuff
-            # self.writer.add_audio('mix', batch['mix'][0], sample_rate=8000)
-            # self.writer.add_audio('s1', batch['s1'][0], sample_rate=8000)
-            # self.writer.add_audio('s2', batch['s2'][0], sample_rate=8000)
-            self.writer.add_audio('output_audios1', batch['output_audios'][0][0], sample_rate=8000)
-            self.writer.add_audio('output_audios2', batch['output_audios'][1][0], sample_rate=8000)
+            # self.writer.add_audio('output_audios1', 
+            #                       peak_norm(batch['output_audios'][0][0], batch['mix'][0]),
+            #                       sample_rate=8000)
+            # self.writer.add_audio('output_audios2', 
+            #                       peak_norm(batch['output_audios'][1][0], batch['mix'][0]), 
+            #                       sample_rate=8000)
         else:
             # Log Stuff
             self.writer.add_audio('mix', batch['mix'][0], sample_rate=8000)
             self.writer.add_audio('s1', batch['s1'][0], sample_rate=8000)
             self.writer.add_audio('s2', batch['s2'][0], sample_rate=8000)
-            self.writer.add_audio('output_audios1', batch['output_audios'][0][0], sample_rate=8000)
-            self.writer.add_audio('output_audios2', batch['output_audios'][1][0], sample_rate=8000)
+            self.writer.add_audio('output_audios1', 
+                                  peak_norm(batch['output_audios'][0][0], batch['mix'][0]),
+                                  sample_rate=8000)
+            self.writer.add_audio('output_audios2', 
+                                  peak_norm(batch['output_audios'][1][0], batch['mix'][0]), 
+                                  sample_rate=8000)

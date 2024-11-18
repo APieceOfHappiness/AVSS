@@ -108,6 +108,8 @@ wandb/
 .cometml-runs/
 outputs/
 dla_dataset/
+training_logs/
+run_train.sh
 video_runner.py
 
 # editor, os cache directory

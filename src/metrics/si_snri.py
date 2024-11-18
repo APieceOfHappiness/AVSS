@@ -32,11 +32,17 @@ class SI_SNRiMetric(BaseMetric):
         num_spks, B, L = refs.shape
         assert num_spks == 2, 'Unfortunately, we can only work with 2 speakers'
 
-        first_score = self.si_sdr(preds, refs)
-        second_score = self.si_sdr(torch.flip(preds, [0]), refs)
-        mix_sisnr = self.si_sdr(torch.stack([mix, mix], dim=0), refs)
+        score = 0
+        preds_flipped = torch.flip(preds, [0])
+        for batch_idx in range(B):
+            first_score = self.si_sdr(preds[:, batch_idx, :], refs[:, batch_idx, :])
+            second_score = self.si_sdr(preds_flipped[:, batch_idx, :], refs[:, batch_idx, :])
+            mix_score = self.si_sdr(mix[batch_idx, :], refs[0, batch_idx, :])
+            mix_score += self.si_sdr(mix[batch_idx, :], refs[1, batch_idx, :])
+            score += torch.max(first_score, second_score) - mix_score / 2
+
  
-        return torch.max(first_score, second_score) - mix_sisnr
+        return score / B
 
     def __call__(self, output_audios: torch.Tensor, s1: torch.Tensor, s2: torch.Tensor, mix: torch.Tensor, **kwargs):
         """

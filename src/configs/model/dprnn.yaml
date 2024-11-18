@@ -1,7 +1,7 @@
 _target_: src.model.DPRNNModel
-feature_dim: 128 # 64
+feature_dim: 64 # 64
 num_of_speakers: 2
-num_dprnn_layers: 3
+num_dprnn_layers: 6
 norm_type: LayerNorm  # [LayerNorm, RMSNorm]
 
 feature_extractor_config:

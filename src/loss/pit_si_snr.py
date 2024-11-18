@@ -25,8 +25,13 @@ class PITSiSNRLoss(nn.Module):
         num_spks, B, L = egs.shape
         assert num_spks == 2, 'Unfortunately, we can only work with 2 speakers'
 
-        first_score = self.si_sdr(output_audios, egs)
-        second_score = self.si_sdr(torch.flip(output_audios, [0]), egs)
-        print(f'dif: {first_score - second_score}')
+        loss = 0
+        output_audios_flipped = torch.flip(output_audios, [0])
+        for batch_idx in range(B):
+            first_score = self.si_sdr(output_audios[:, batch_idx, :], egs[:, batch_idx, :])
+            second_score = self.si_sdr(output_audios_flipped[:, batch_idx, :], egs[:, batch_idx, :])
+            loss += torch.max(first_score, second_score)
+
+        # print(f'dif: {first_score - second_score}')
         
-        return {"loss": -torch.max(first_score, second_score)}
+        return {"loss": -loss / B}

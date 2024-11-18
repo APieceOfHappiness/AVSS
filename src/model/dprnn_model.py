@@ -184,7 +184,6 @@ class DPRNNModel(nn.Module):
         output_audios = torch.stack([self.decoder(gated_masks[speaker_id] * mix)
                                      for speaker_id in range(self.num_of_speakers)]).squeeze(2)
 
-
         return {"output_audios": output_audios}
 
     def __str__(self):
@@ -201,3 +200,7 @@ class DPRNNModel(nn.Module):
         result_info = result_info + f"\nTrainable parameters: {trainable_parameters}"
 
         return result_info
+
+
+# class AVDPRNNModel:
+#     def __init__(self,)
