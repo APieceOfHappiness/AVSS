@@ -7,24 +7,26 @@ defaults:
   - transforms: example
   - _self_
 optimizer:
-  _target_: torch.optim.Adam
-  lr: 3e-4
+  _target_: torch.optim.AdamW
+  lr: 4e-4
 lr_scheduler:
   _target_: torch.optim.lr_scheduler.StepLR
-  gamma: 0.9
+  gamma: 1
   step_size: ${trainer.epoch_len}
 loss_function:
   _target_: src.loss.PITSiSNRLoss
 trainer:
-  log_step: 10
+  log_step: 100
   n_epochs: 100
-  epoch_len: 300
+  epoch_len: 5000
+  max_grad_norm: 5
   device_tensors: ["mix", "s1", "s2", "vid1", "vid2"] # which tensors should be on device (ex. GPU) if exists!
   resume_from: null # null or path to the checkpoint dir with *.pth and config.yaml
   device: auto # device name or "auto"
   override: False # if True, will override the previous run with the same name
   monitor: "max SI_SNRiMetric" # "off" or "max/min metric_name", i.e. our goal is to maximize/minimize metric
-  save_period: 5 # checkpoint each save_period epochs in addition to the best epoch
+  save_period: 1 # checkpoint each save_period epochs in addition to the best epoch
   early_stop: ${trainer.n_epochs} # epochs for early stopping
+  use_compile: True
   save_dir: "saved"
   seed: 1
