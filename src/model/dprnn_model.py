@@ -63,7 +63,7 @@ class Gate(nn.Module):
 
 class DPRNNModel(nn.Module):
     def __init__(self, feature_dim, num_of_speakers, num_dprnn_layers, norm_type,
-                 feature_extractor_config, split_config, dprnn_block_config, **kwargs):
+                 feature_extractor_config, split_config, dprnn_block_config, audio_only, **kwargs):
         """
         Args:
             n_feats (int): number of input features.
@@ -71,6 +71,7 @@ class DPRNNModel(nn.Module):
             fc_hidden (int): number of hidden features.
         """
         super().__init__()
+        self.audio_only = audio_only
         self.feature_dim = feature_dim
         self.num_of_speakers = num_of_speakers
         self.split_config = split_config
@@ -146,7 +147,7 @@ class DPRNNModel(nn.Module):
         return reduced_tensor
 
 
-    def forward(self, mix: torch.Tensor, **batch) -> dict[list[torch.Tensor]]:
+    def forward(self, mix: torch.Tensor, vid1: torch.Tensor = None, vid2: torch.Tensor = None, **batch) -> dict[list[torch.Tensor]]:
         """
         Model forward method.
 
@@ -161,11 +162,13 @@ class DPRNNModel(nn.Module):
         mix = self.feature_extractor(mix)  # [B, N, L]
         mask = self.norm(mix.permute(0, 2, 1)).permute(0, 2, 1)  # [B, N, L] (!)
 
+        if vid1 is not None and vid2 is not None and not self.audio_only:
+            mask += vid1 + vid2
+
         mask = self._split_input(mix=mask, **self.split_config)  # [B, N, K, S]
 
         #  for stability
         mask = self.dprnn_blocks(mask)  # [B, N, K, S]
-
         mask = self.relu(mask)  # [B, N, K, S] (!)
         
         # ts
@@ -200,7 +203,3 @@ class DPRNNModel(nn.Module):
         result_info = result_info + f"\nTrainable parameters: {trainable_parameters}"
 
         return result_info
-
-
-# class AVDPRNNModel:
-#     def __init__(self,)

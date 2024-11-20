@@ -31,7 +31,5 @@ class PITSiSNRLoss(nn.Module):
             first_score = self.si_sdr(output_audios[:, batch_idx, :], egs[:, batch_idx, :])
             second_score = self.si_sdr(output_audios_flipped[:, batch_idx, :], egs[:, batch_idx, :])
             loss += torch.max(first_score, second_score)
-
-        # print(f'dif: {first_score - second_score}')
         
         return {"loss": -loss / B}

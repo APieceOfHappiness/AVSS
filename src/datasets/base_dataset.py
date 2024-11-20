@@ -1,6 +1,7 @@
 import logging
 import random
 from typing import List
+import numpy as np
 
 import torch
 import torchaudio
@@ -60,16 +61,19 @@ class BaseDataset(Dataset):
         data_sample = self._index[ind]
         data_sample['mix'] = self.load_audio(data_sample['mix'])
 
-        if 's1' in data_sample and 's2' in data_sample:
+        if 's1' in data_sample and 's2' in data_sample:  # for bss
             data_sample['s1'] = self.load_audio(data_sample['s1'])
             data_sample['s2'] = self.load_audio(data_sample['s2'])
+        elif 's1' in data_sample:  # for tss
+            data_sample['s1'] = self.load_audio(data_sample['s1'])
 
-        if 'vid1' in data_sample and 'vid2' in data_sample:
+        if 'vid1' in data_sample and 'vid2' in data_sample:  # for bss
             data_sample['vid1'] = self.load_video(data_sample['vid1'])
             data_sample['vid2'] = self.load_video(data_sample['vid2'])
+        elif 'vid1' in data_sample:  # for tss
+            data_sample['vid1'] = self.load_video(data_sample['vid1'])
 
         data_sample = self.preprocess_data(data_sample)
-
         return data_sample
 
     def __len__(self):
@@ -86,9 +90,8 @@ class BaseDataset(Dataset):
             audio_tensor = torchaudio.functional.resample(audio_tensor, sr, target_sr)
         return audio_tensor
 
-    # TODO:
     def load_video(self, path):
-        return None 
+        return torch.tensor(np.load(path)['data'])
 
     def preprocess_data(self, instance_data):
         """

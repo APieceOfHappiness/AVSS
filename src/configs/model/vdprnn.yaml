@@ -1,0 +1,38 @@
+_target_: src.model.VDPRNNModel
+pretrained_dprnn_path: "" #  "/home/admin/workspace/AVSS/dprnn_pretrained/checkpoint-epoch29.pth"
+dprnn_config:
+  audio_only: False
+  feature_dim: 64 # 64
+  num_of_speakers: 2
+  num_dprnn_layers: 6
+  norm_type: LayerNorm  # [LayerNorm, RMSNorm]
+
+  feature_extractor_config:
+    kernel_size: 3
+    padding: 1
+    stride: 2
+
+  split_config:
+    chunks_length: 100
+    hop_size: 50
+
+  dprnn_block_config:
+    feature_dim: ${model.dprnn_config.feature_dim}
+    hidden_channels: 128
+    rnn_type: LSTM  # [LSTM, GRU]
+    norm_type: ${model.dprnn_config.norm_type}
+    dropout: 0
+    bidirectional: True
+
+video_encoder_config:
+  audio_len: 8000
+  video_dim: 512
+  hidden_dim1: 256
+  hidden_dim2: 128
+  audio_dim: ${model.dprnn_config.feature_dim}
+  kernel_size: 3
+  norm_type: LayerNorm
+
+
+
+

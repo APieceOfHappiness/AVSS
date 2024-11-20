@@ -92,10 +92,10 @@ class Trainer(BaseTrainer):
             # Log Stuff
             self.writer.add_audio('mix', batch['mix'][0], sample_rate=8000)
             self.writer.add_audio('s1', batch['s1'][0], sample_rate=8000)
-            self.writer.add_audio('s2', batch['s2'][0], sample_rate=8000)
+            # self.writer.add_audio('s2', batch['s2'][0], sample_rate=8000)
             self.writer.add_audio('output_audios1', 
-                                  peak_norm(batch['output_audios'][0][0], batch['mix'][0]),
+                                  peak_norm(batch['output_audio'][0], batch['mix'][0]),
                                   sample_rate=8000)
-            self.writer.add_audio('output_audios2', 
-                                  peak_norm(batch['output_audios'][1][0], batch['mix'][0]), 
-                                  sample_rate=8000)
+            # self.writer.add_audio('output_audios2', 
+            #                       peak_norm(batch['output_audios'][1][0], batch['mix'][0]), 
+            #                       sample_rate=8000)
