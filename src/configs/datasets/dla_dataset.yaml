@@ -3,7 +3,8 @@ train:
   dataset_path: "dla_dataset"
   dataset_length: null
   audio_ref: True
-  video_ref: False 
+  video_ref: True
+  refs_cnt: 1  # Only 1 or 2 [2 for bss, 1 for tss] 
   name: "train"
   override: True
   instance_transforms: ${transforms.instance_transforms.train}
@@ -12,7 +13,8 @@ val:
   dataset_path: "dla_dataset"
   dataset_length: null
   audio_ref: True
-  video_ref: False 
+  video_ref: True
+  refs_cnt: 1
   name: "val"
   override: True
   instance_transforms: ${transforms.instance_transforms.train}

@@ -1,4 +1,5 @@
 _target_: src.model.DPRNNModel
+audio_only: True
 feature_dim: 64 # 64
 num_of_speakers: 2
 num_dprnn_layers: 6

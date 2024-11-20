@@ -1,0 +1,39 @@
+defaults:
+  - model: vdprnn # 3
+  - writer: wandb
+  - metrics: si_snri # 4
+  - datasets: dla_dataset # 1
+  - dataloader: dla_dataloader # 2
+  - transforms: example
+  - _self_
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 5e-4
+  # lr: 1e-3
+lr_scheduler:
+  # _target_: torch.optim.lr_scheduler.LinearLR
+  # start_factor: 0.05 # 0.1
+  # end_factor: 1.0
+  # total_iters: 5000
+
+  _target_: torch.optim.lr_scheduler.StepLR
+  gamma: 0.5
+  step_size: 20000
+    
+loss_function:
+  _target_: src.loss.PITSiSNRLoss
+trainer:
+  log_step: 100
+  n_epochs: 100
+  epoch_len: 2500
+  max_grad_norm: 5
+  device_tensors: ["mix", "s1", "s2", "vid1", "vid2"] # which tensors should be on device (ex. GPU) if exists!
+  resume_from: null # null or path to the checkpoint dir with *.pth and config.yaml
+  device: auto # device name or "auto"
+  override: False # if True, will override the previous run with the same name
+  monitor: "max SI_SNRiMetric" # "off" or "max/min metric_name", i.e. our goal is to maximize/minimize metric
+  save_period: 1 # checkpoint each save_period epochs in addition to the best epoch
+  early_stop: ${trainer.n_epochs} # epochs for early stopping
+  use_compile: False
+  save_dir: "saved"
+  seed: 1

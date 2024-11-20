@@ -1,0 +1,32 @@
+_target_: src.model.CTCNet
+audio_blocks_cnt: 8
+video_blocks_cnt: 4
+audio_emb_dim: 128
+video_emb_dim: 64
+
+audio_block_config:
+  hidden_dim: ${model.audio_emb_dim}
+  audio_len: 16000  # Sr * 2 = 8000 * 2
+  num_layers: 4
+  kernel_size: 5
+
+video_block_config:
+  hidden_dim: ${model.video_emb_dim}
+  audio_len: 256  # 
+  num_layers: 4
+  kernel_size: 5
+
+thalamic_block_config:
+  audio_dim: ${model.audio_emb_dim}
+  video_dim: ${model.video_emb_dim}
+
+audio_encoder_config:
+  kernel_size: 21
+  padding: 10  # 3 // 2
+  stride: 10
+
+video_encoder_config:
+  kernel_size: 3
+  padding: 1  # 3 // 2
+  upsample_size: 256
+  stride: 1

@@ -1,7 +1,7 @@
 _target_: src.logger.WandBWriter
-project_name: "AVSS_DLA"
+project_name: "AVSS_DLA (CTCNet)"
 entity: null
-run_name: "first_dprnn"
+run_name: "ctc_net"
 mode: "online"
 loss_names: ["loss"] # which losses to log (useful for multi-loss tasks, s.a. GANs)
 log_checkpoints: False # set to True if you want to log save_dir with checkpoints to W&B
