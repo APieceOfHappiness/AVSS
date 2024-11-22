@@ -1,0 +1,17 @@
+device: "auto"
+inference:  # metrics that are calculated during inference (eval)
+  - _target_: src.metrics.SDRiMetric
+    device: ${metrics.device}
+    name: SDRiMetric
+
+  - _target_: src.metrics.SI_SNRiMetric
+    device: ${metrics.device}
+    name: SI_SNRiMetric
+
+  - _target_: src.metrics.PESQMetric
+    device: ${metrics.device}
+    name: PESQMetric
+
+  - _target_: src.metrics.STOIMetric
+    device: ${metrics.device}
+    name: STOIMetric

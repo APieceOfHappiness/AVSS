@@ -1,0 +1,9 @@
+test:
+  _target_: src.datasets.CustomDirDataset
+  dataset_path: "custom_dataset"
+  dataset_length: 16
+  audio_ref: True
+  video_ref: False 
+  refs_cnt: 2
+  override: True
+  instance_transforms: ${transforms.instance_transforms.train}

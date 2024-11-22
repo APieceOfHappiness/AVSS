@@ -108,9 +108,13 @@ wandb/
 .cometml-runs/
 outputs/
 dla_dataset/
+custom_dataset/
 training_logs/
 run_train.sh
 video_runner.py
+
+#notebooks
+*.ipynb
 
 # editor, os cache directory
 .vscode/
