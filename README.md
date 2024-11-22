@@ -37,7 +37,7 @@ To save the separation predictions made by the pre-trained model (and enabling i
            inferencer.save_path=<name of the folder for predicted separation> \
            inferencer.from_pretrained="./saved/dprnn_pretrained/checkpoint-epoch58.pth"
     ```
-    
+
    (datasets.audio_ref is True if s1 and s2 are in the dataset_path, for inferencer.calc_metrics=True, datasets.audio_ref must be True)
 
    To calculate metrics (SI-SNR, SDRi, PESQ, and STOI) for the given directories of target and predicted paths, use the following script:
@@ -46,7 +46,7 @@ To save the separation predictions made by the pre-trained model (and enabling i
            metrics_calculator.target_path=<dir of custom dataset> \
            metrics_calculator.preds_path=<dir of custom dataset> \
            metrics_calculator.save_results_path=<dir of folder to save json with results>
-    ```
+   ```
 
 ## Train
    Training script for DPRNN:
