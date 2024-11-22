@@ -73,7 +73,7 @@ class PESQMetric(BaseMetric):
             refs (Tensor): ground-truth signals, tensor of shape (num_spks, B, L)
             mix (Tensor): mixed signal, tensor of shape (B, L)
         Returns:
-            metric (float): calculated SDRi
+            metric (float): calculated PESQ
         """
         refs = torch.stack([s1, s2])
         output_audios, refs, mix = output_audios.to(self.device), refs.to(self.device), mix.to(self.device)
