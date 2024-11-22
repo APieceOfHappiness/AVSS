@@ -9,6 +9,6 @@ inferencer:
   device_tensors: ["mix", "s1", "s2", "vid1", "vid2"] # which tensors should be on device (ex. GPU)
   device: auto # device name or "auto"
   save_path: "inference_reslts" # any name here, can be a dataset name, None if without saving
-  calc_metrics: False
+  calc_metrics: False           # True if need to calculate metric while inference
   seed: 1
-  from_pretrained: "./saved/dprnn_pretrained/checkpoint-epoch29.pth" # path to the pretrained model
+  from_pretrained: "./saved/dprnn_pretrained/checkpoint-epoch58.pth" # path to the pretrained model

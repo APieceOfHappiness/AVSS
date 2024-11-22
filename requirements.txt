@@ -16,4 +16,6 @@ pre-commit
 opencv-python
 torchaudio==2.2.0
 soundfile
-sounddevice # для video_runner.py
+sounddevice
+pystoi
+pesq==0.0.4

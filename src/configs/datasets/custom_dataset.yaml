@@ -2,7 +2,7 @@ test:
   _target_: src.datasets.CustomDirDataset
   dataset_path: "custom_dataset"
   dataset_length: null
-  audio_ref: False
+  audio_ref: True
   video_ref: False 
   refs_cnt: 2
   override: True
