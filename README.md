@@ -27,16 +27,16 @@ pip install -r requirements.txt
 ```
 
 ## Inference
-To save the separation predictions made by the pre-trained model (and enabling immediate calculation of metrics), use the following script:
-    ```bash
-    python inference.py \
-           datasets.dataset_path=<dir of custom dataset> \
-           datasets.audio_ref=<True or False> \
-           inferencer.calc_metrics=<True or False> \
-           inferencer.device=<device> \
-           inferencer.save_path=<name of the folder for predicted separation> \
-           inferencer.from_pretrained="./saved/dprnn_pretrained/checkpoint-epoch58.pth"
-    ```
+   To save the separation predictions made by the pre-trained model (and enabling immediate calculation of metrics), use the following script:
+   ```bash
+   python inference.py \
+          datasets.dataset_path=<dir of custom dataset> \
+          datasets.audio_ref=<True or False> \
+          inferencer.calc_metrics=<True or False> \
+          inferencer.device=<device> \
+          inferencer.save_path=<name of the folder for predicted separation> \
+          inferencer.from_pretrained="./saved/dprnn_pretrained/checkpoint-epoch58.pth"
+   ```
 
    (datasets.audio_ref is True if s1 and s2 are in the dataset_path, for inferencer.calc_metrics=True, datasets.audio_ref must be True)
 
