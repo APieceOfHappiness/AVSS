@@ -556,3 +556,22 @@ class BaseTrainer:
             self.model.load_state_dict(checkpoint["state_dict"])
         else:
             self.model.load_state_dict(checkpoint)
+
+    def peak_norm(self, pred_audio: torch.Tensor, ref_audio: torch.Tensor) -> torch.Tensor:
+
+        """
+        Normalize each predicted audio signal to match the peak amplitude 
+        of the corresponding reference audio signal, handling multiple speakers.
+
+        Args:
+            pred_audio (torch.Tensor): Predicted audio signals, tensor of shape (L, )
+            ref_audio (torch.Tensor): Reference audio signals (mix), tensor of shape (L, )
+
+        Returns:
+            torch.Tensor: Normalized predicted audio signals, tensor of shape (L, )
+        """
+        pred_audio = pred_audio - pred_audio.mean()
+        peak_pred = torch.max(torch.abs(pred_audio))
+        peak_ref = torch.max(torch.abs(ref_audio))
+        normalized_audio = pred_audio * (peak_ref / peak_pred)
+        return normalized_audio

@@ -56,7 +56,7 @@ class VDPRNNModel(nn.Module):
         conv3_param = sum(conv3_param) / len(conv3_param)
         # norm_param = [torch.norm(p).item() for p in self.video_encoder.norm..parameters()]
         # norm_param = sum(norm_param) / len(norm_param)
-        print(f'encoder_norm (c1, c2, c3, norm):', conv1_param, conv2_param, conv3_param, torch.norm(self.video_encoder.norm.weight).item())
+        # print(f'encoder_norm (c1, c2, c3, norm):', conv1_param, conv2_param, conv3_param, torch.norm(self.video_encoder.norm.weight).item())
 
         return self.dprnn_model(mix, encoded_vid1, encoded_vid2)
     

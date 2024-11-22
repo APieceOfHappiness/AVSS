@@ -1,0 +1,19 @@
+val:
+  _target_: src.datasets.DlaDataset
+  dataset_path: "dla_dataset"
+  dataset_length: null
+  audio_ref: True
+  video_ref: True
+  refs_cnt: 2
+  name: "val"
+  override: True
+  instance_transforms: ${transforms.instance_transforms.train}
+# test:
+#   _target_: src.datasets.DlaDataset
+#   dataset_path: "dla_dataset"
+#   dataset_length: null
+#   audio_ref: True
+#   video_ref: False 
+#   name: "test"
+#   override: False
+#   instance_transforms: ${transforms.instance_transforms.train}

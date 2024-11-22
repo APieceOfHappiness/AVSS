@@ -1,4 +1,4 @@
-import torch
+import torch, torchaudio
 from tqdm.auto import tqdm
 
 from src.metrics.tracker import MetricTracker
@@ -129,27 +129,22 @@ class Inferencer(BaseTrainer):
         # Some saving logic. This is an example
         # Use if you need to save predictions on disk
 
-        batch_size = batch["logits"].shape[0]
+        if self.save_path is None:
+            return batch
+
+        batch_size = batch["output_audios"].shape[0]
         current_id = batch_idx * batch_size
 
         for i in range(batch_size):
             # clone because of
             # https://github.com/pytorch/pytorch/issues/1995
-            logits = batch["logits"][i].clone()
-            label = batch["labels"][i].clone()
-            pred_label = logits.argmax(dim=-1)
+            s1_pred = self.peak_norm(batch["output_audios"][0][i].clone(), batch["mix"][i].clone())
+            s2_pred = self.peak_norm(batch["output_audios"][1][i].clone(), batch["mix"][i].clone())
+            mix_name = batch["mix_name"][i]
 
-            output_id = current_id + i
-
-            output = {
-                "pred_label": pred_label,
-                "label": label,
-            }
-
-            if self.save_path is not None:
-                # you can use safetensors or other lib here
-                torch.save(output, self.save_path / part / f"output_{output_id}.pth")
-
+            torchaudio.save(f"{self.save_path}/s1/{mix_name}.wav", s1_pred.unsqueeze(0).cpu(), sample_rate=8000)
+            torchaudio.save(f"{self.save_path}/s2/{mix_name}.wav", s2_pred.unsqueeze(0).cpu(), sample_rate=8000)
+        
         return batch
 
     def _inference_part(self, part, dataloader):
@@ -170,8 +165,8 @@ class Inferencer(BaseTrainer):
 
         # create Save dir
         if self.save_path is not None:
-            (self.save_path / part).mkdir(exist_ok=True, parents=True)
-
+            (self.save_path / "s1").mkdir(exist_ok=True, parents=True)
+            (self.save_path / "s2").mkdir(exist_ok=True, parents=True)
         with torch.no_grad():
             for batch_idx, batch in tqdm(
                 enumerate(dataloader),

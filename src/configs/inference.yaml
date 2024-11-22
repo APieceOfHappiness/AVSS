@@ -1,13 +1,13 @@
 defaults:
-  - model: baseline
-  - metrics: example
-  - datasets: example_eval # we do not want to run inference on training data
-  - dataloader: example
+  - model: dprnn
+  - metrics: bss_inference_metrics        #TODO: make it possible to work with null + add metrics by dirs of refs and preds only
+  - datasets: custom_dataset # we do not want to run inference on training data
+  - dataloader: dla_dataloader
   - transforms: example
   - _self_
 inferencer:
-  device_tensors: ["data_object", "labels"] # which tensors should be on device (ex. GPU)
-  device: auto # device name or "auto"
-  save_path: "example" # any name here, can be a dataset name
+  device_tensors: ["mix", "s1", "s2", "vid1", "vid2"] # which tensors should be on device (ex. GPU)
+  device: cuda # device name or "auto"
+  save_path: "inference_reslts" # any name here, can be a dataset name, None if without saving
   seed: 1
-  from_pretrained: "saved/model_best.pth" # path to the pretrained model
+  from_pretrained: "./saved/dprnn_pretrained/checkpoint-epoch29.pth" # path to the pretrained model

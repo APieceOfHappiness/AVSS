@@ -70,18 +70,13 @@ class Trainer(BaseTrainer):
             mode (str): train or inference. Defines which logging
                 rules to apply.
         """
-        def peak_norm(pred_audio: torch.Tensor, ref_audio: torch.Tensor) -> torch.Tensor:
-            peak_pred = torch.max(torch.abs(pred_audio))
-            peak_ref = torch.max(torch.abs(ref_audio))
-            normalized_audio = pred_audio * (peak_ref / peak_pred)
-            return normalized_audio
 
         # method to log data from you batch
         # such as audio, text or images, for example
 
         if mode == "train":  # the method is called only every self.log_step steps
             pass
-            # Log Stuff
+            # Log Stuff     # TODO: return for BSS mode
             # self.writer.add_audio('output_audios1', 
             #                       peak_norm(batch['output_audios'][0][0], batch['mix'][0]),
             #                       sample_rate=8000)
@@ -94,7 +89,7 @@ class Trainer(BaseTrainer):
             self.writer.add_audio('s1', batch['s1'][0], sample_rate=8000)
             # self.writer.add_audio('s2', batch['s2'][0], sample_rate=8000)
             self.writer.add_audio('output_audios1', 
-                                  peak_norm(batch['output_audio'][0], batch['mix'][0]),
+                                  self.peak_norm(batch['output_audio'][0], batch['mix'][0]),
                                   sample_rate=8000)
             # self.writer.add_audio('output_audios2', 
             #                       peak_norm(batch['output_audios'][1][0], batch['mix'][0]), 

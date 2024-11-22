@@ -1,0 +1,9 @@
+device: "auto"
+train: [] # metrics that are calculated during training
+  # - _target_: src.metrics.SDRiMetric
+  #   device: ${metrics.device}
+  #   name: SDRiMetric
+inference:  # metrics that are calculated during inference (eval)
+  - _target_: src.metrics.SDRiMetric
+    device: ${metrics.device}
+    name: SDRiMetric
