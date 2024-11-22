@@ -68,7 +68,7 @@ class Inferencer(BaseTrainer):
 
         # define metrics
         self.metrics = metrics
-        if self.metrics is not None:
+        if len(self.metrics) != 0:
             self.evaluation_metrics = MetricTracker(
                 *[m.name for m in self.metrics["inference"]],
                 writer=None,
@@ -122,7 +122,7 @@ class Inferencer(BaseTrainer):
         outputs = self.model(**batch)
         batch.update(outputs)
 
-        if metrics is not None:
+        if len(self.metrics) != 0:
             for met in self.metrics["inference"]:
                 metrics.update(met.name, met(**batch))
 
@@ -161,7 +161,8 @@ class Inferencer(BaseTrainer):
         self.is_train = False
         self.model.eval()
 
-        self.evaluation_metrics.reset()
+        if len(self.metrics) != 0:
+            self.evaluation_metrics.reset()
 
         # create Save dir
         if self.save_path is not None:
@@ -179,5 +180,7 @@ class Inferencer(BaseTrainer):
                     part=part,
                     metrics=self.evaluation_metrics,
                 )
-
-        return self.evaluation_metrics.result()
+        if len(self.metrics) != 0:
+            return self.evaluation_metrics.result()
+        
+        return {}
