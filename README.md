@@ -7,10 +7,10 @@ The model based on [Dual-path RNN](https://arxiv.org/abs/1910.06379).
 <!-- See [wandb report](https://wandb.ai/dungeon_as_fate/pytorch_template_asr_example). -->
 
 ## Results on train and validation:
-```angular2html
-                SI_SNRi     SDRi    PESQ     STOI
-DPRNN            13.01      12.67    2.9     0.9
-```
+
+| Model  | SI_SNRi | SDRi  | PESQ | STOI |
+|--------|---------|-------|------|------|
+| DPRNN  | 13.01   | 12.67 | 2.9  | 0.9  |
 
 ## Installation
 
@@ -40,8 +40,7 @@ pip install -r requirements.txt
     ```
    (datasets.audio_ref is True if s1 and s2 are in the dataset_path, for inferencer.calc_metrics=True, datasets.audio_ref must be True)
 
-
-    To calculate metrics (SI-SNR, SDRi, PESQ, and STOI) for the given directories of target and predicted paths, use the following script:
+   To calculate metrics (SI-SNR, SDRi, PESQ, and STOI) for the given directories of target and predicted paths, use the following script:
 
    ```bash
     python calc_metrics.py \
@@ -53,6 +52,7 @@ pip install -r requirements.txt
 ## Train
 
 Training script for DPRNN:
+
 ```bash
 python train.py \
        trainer.device=<device> trainer.override=True \
