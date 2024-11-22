@@ -24,7 +24,7 @@ class CustomDirDataset(BaseDataset):
     def _create_index(self, dataset_path, dataset_length, audio_ref, video_ref, refs_cnt):
         index_path = ROOT_PATH / dataset_path / "index"
         audio_path = ROOT_PATH / dataset_path / "audio"
-        video_path = ROOT_PATH / dataset_path / "mouths_embs"           # TODO: изменить
+        video_path = ROOT_PATH / dataset_path / "mouths_embs"
 
         data_names = [path.split('.')[0] for path in os.listdir(audio_path / "mix")]
         index_path.mkdir(exist_ok=True, parents=True)

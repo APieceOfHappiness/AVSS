@@ -132,12 +132,10 @@ class Inferencer(BaseTrainer):
         if self.save_path is None:
             return batch
 
-        batch_size = batch["output_audios"].shape[0]
+        batch_size = batch["output_audios"].shape[1]
         current_id = batch_idx * batch_size
 
         for i in range(batch_size):
-            # clone because of
-            # https://github.com/pytorch/pytorch/issues/1995
             s1_pred = self.peak_norm(batch["output_audios"][0][i].clone(), batch["mix"][i].clone())
             s2_pred = self.peak_norm(batch["output_audios"][1][i].clone(), batch["mix"][i].clone())
             mix_name = batch["mix_name"][i]

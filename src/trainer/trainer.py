@@ -74,23 +74,13 @@ class Trainer(BaseTrainer):
         # method to log data from you batch
         # such as audio, text or images, for example
 
-        if mode == "train":  # the method is called only every self.log_step steps
-            pass
-            # Log Stuff     # TODO: return for BSS mode
-            # self.writer.add_audio('output_audios1', 
-            #                       peak_norm(batch['output_audios'][0][0], batch['mix'][0]),
-            #                       sample_rate=8000)
-            # self.writer.add_audio('output_audios2', 
-            #                       peak_norm(batch['output_audios'][1][0], batch['mix'][0]), 
-            #                       sample_rate=8000)
-        else:
-            # Log Stuff
+        if mode != "train":  # the method is called only every self.log_step steps
             self.writer.add_audio('mix', batch['mix'][0], sample_rate=8000)
             self.writer.add_audio('s1', batch['s1'][0], sample_rate=8000)
-            # self.writer.add_audio('s2', batch['s2'][0], sample_rate=8000)
+            self.writer.add_audio('s2', batch['s2'][0], sample_rate=8000)
             self.writer.add_audio('output_audios1', 
                                   self.peak_norm(batch['output_audio'][0], batch['mix'][0]),
                                   sample_rate=8000)
-            # self.writer.add_audio('output_audios2', 
-            #                       peak_norm(batch['output_audios'][1][0], batch['mix'][0]), 
-            #                       sample_rate=8000)
+            self.writer.add_audio('output_audios2', 
+                                  self.peak_norm(batch['output_audios'][1][0], batch['mix'][0]), 
+                                  sample_rate=8000)
