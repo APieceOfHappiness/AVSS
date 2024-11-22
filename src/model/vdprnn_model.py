@@ -6,7 +6,7 @@ class VideoEncoder(nn.Module):
     def __init__(self, audio_len, video_dim, hidden_dim1, hidden_dim2, audio_dim, kernel_size, norm_type, **kwargs):
         super().__init__()
         self.upsample = nn.Upsample(audio_len)
-        self.conv1 = nn.Conv1d(in_channels=video_dim, out_channels=hidden_dim1, kernel_size=kernel_size, padding=kernel_size // 2)  # TODO: for even ks
+        self.conv1 = nn.Conv1d(in_channels=video_dim, out_channels=hidden_dim1, kernel_size=kernel_size, padding=kernel_size // 2)
         self.conv2 = nn.Conv1d(in_channels=hidden_dim1, out_channels=hidden_dim2, kernel_size=kernel_size, padding=kernel_size // 2)
         self.conv3 = nn.Conv1d(in_channels=hidden_dim2, out_channels=audio_dim, kernel_size=kernel_size, padding=kernel_size // 2)
 

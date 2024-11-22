@@ -1,0 +1,8 @@
+defaults:
+  - metrics: bss_inference_metrics
+
+metrics_calculator:
+  target_path: "custom_dataset"     # NameOfTheDirectoryWithUtterances
+  preds_path: "inference_reslts"      # save_path
+  save_results_path: null
+  device: "auto"
