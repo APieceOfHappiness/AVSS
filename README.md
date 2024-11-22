@@ -28,7 +28,6 @@ pip install -r requirements.txt
 
 ## Inference
    To save the separation predictions made by the pre-trained model (and enabling immediate calculation of metrics), use the following script:
-
     ```bash
     python inference.py \
            datasets.dataset_path=<dir of custom dataset> \
@@ -41,7 +40,6 @@ pip install -r requirements.txt
    (datasets.audio_ref is True if s1 and s2 are in the dataset_path, for inferencer.calc_metrics=True, datasets.audio_ref must be True)
 
    To calculate metrics (SI-SNR, SDRi, PESQ, and STOI) for the given directories of target and predicted paths, use the following script:
-
    ```bash
     python calc_metrics.py \
            metrics_calculator.target_path=<dir of custom dataset> \
@@ -50,12 +48,10 @@ pip install -r requirements.txt
     ```
 
 ## Train
-
-Training script for DPRNN:
-
-```bash
-python train.py \
-       trainer.device=<device> trainer.override=True \
-       writer.log_checkpoints=True \
-       writer.run_name=dprnn_train
-```
+   Training script for DPRNN:
+   ```bash
+   python train.py \
+          trainer.device=<device> trainer.override=True \
+          writer.log_checkpoints=True \
+          writer.run_name=dprnn_train
+   ```
